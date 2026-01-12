@@ -1,0 +1,52 @@
+package jdbc_batch;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.util.Scanner;
+
+public class Second {
+
+	public static void main(String[] args) throws Exception {
+		
+		 Class.forName("com.mysql.cj.jdbc.Driver");
+		 
+			Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/employee","root","12345");
+		
+			PreparedStatement stmt=con.prepareStatement("insert into employee values(?,?);");
+			
+			 
+			con.setAutoCommit(false);
+			
+			Scanner scan=new Scanner(System.in);
+			try {
+			int count=1;
+			while(count<4) {
+			System.out.println("Id:");
+			int id=scan.nextInt();
+			System.out.println("Name:");
+			String name=scan.next();
+			stmt.setInt(1, id);
+			stmt.setString(2, name);
+			stmt.addBatch();
+			count++;
+			}
+		
+			 stmt.executeBatch();
+			
+			System.out.println("Commiting the changes");
+			con.commit();
+			}
+			catch(Exception ex)
+			{
+				System.out.println(ex.getMessage());
+				System.out.println("intiating rollbackkkk....");
+				con.rollback();
+			}
+			
+			con.close();
+			stmt.close();
+
+	}
+
+}
